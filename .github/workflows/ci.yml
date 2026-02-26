@@ -79,7 +79,7 @@ jobs:
       - name: Install dependencies
         run: |
           apt-get update
-          apt-get install -y python3-pip python3-numpy python3-pyside2
+          apt-get install -y python3-pip python3-numpy
 
       - name: Build workspace
         run: |

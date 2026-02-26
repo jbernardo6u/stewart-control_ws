@@ -3,12 +3,11 @@
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import Float32MultiArray
-import math
-
 
 # ============================================================
 # Outils angles
 # ============================================================
+
 
 def wrap_deg(a):
     return (float(a) + 180.0) % 360.0 - 180.0
@@ -17,6 +16,7 @@ def wrap_deg(a):
 # ============================================================
 # Kalman 1D
 # ============================================================
+
 
 class Kalman1D:
     def __init__(self, q=0.02, r=1.0):
@@ -36,7 +36,7 @@ class Kalman1D:
         if S <= 1e-12:
             return
         K = self.P / S
-        self.x = wrap_deg(self.x + K*y)
+        self.x = wrap_deg(self.x + K * y)
         self.P = (1.0 - K) * self.P
 
 
@@ -44,29 +44,23 @@ class Kalman1D:
 # FUSION NODE
 # ============================================================
 
+
 class FusionNode(Node):
 
     def __init__(self):
-        super().__init__('fusion_node')
+        super().__init__("fusion_node")
 
         # Subscribers
         self.sub_imu = self.create_subscription(
-            Float32MultiArray,
-            'imu_error',
-            self.imu_callback,
-            10)
+            Float32MultiArray, "imu_error", self.imu_callback, 10
+        )
 
         self.sub_cam = self.create_subscription(
-            Float32MultiArray,
-            'aruco_orientation',
-            self.cam_callback,
-            10)
+            Float32MultiArray, "aruco_orientation", self.cam_callback, 10
+        )
 
         # Publisher
-        self.pub_fusion = self.create_publisher(
-            Float32MultiArray,
-            'F_orientation',
-            10)
+        self.pub_fusion = self.create_publisher(Float32MultiArray, "F_orientation", 10)
 
         # Kalman filters
         self.kf_roll = Kalman1D(q=0.02, r=1.0)
@@ -81,7 +75,6 @@ class FusionNode(Node):
 
         self.get_logger().info("Fusion node démarré ✅")
 
-
     # ============================================================
     # IMU callback
     # ============================================================
@@ -90,7 +83,6 @@ class FusionNode(Node):
         self.last_imu = msg.data
         self.compute_fusion()
 
-
     # ============================================================
     # CAM callback
     # ============================================================
@@ -98,7 +90,6 @@ class FusionNode(Node):
     def cam_callback(self, msg):
         self.last_cam = msg.data
         self.compute_fusion()
-
 
     # ============================================================
     # Fusion
@@ -136,11 +127,7 @@ class FusionNode(Node):
 
         # Publish
         msg = Float32MultiArray()
-        msg.data = [
-            float(self.kf_roll.x),
-            float(self.kf_pitch.x),
-            float(self.kf_yaw.x)
-        ]
+        msg.data = [float(self.kf_roll.x), float(self.kf_pitch.x), float(self.kf_yaw.x)]
 
         self.pub_fusion.publish(msg)
 
@@ -155,6 +142,7 @@ class FusionNode(Node):
 # MAIN
 # ============================================================
 
+
 def main(args=None):
     rclpy.init(args=args)
     node = FusionNode()
@@ -163,5 +151,5 @@ def main(args=None):
     rclpy.shutdown()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

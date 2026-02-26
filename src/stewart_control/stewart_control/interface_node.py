@@ -785,8 +785,11 @@ class InterfaceGUI(QWidget):
     def aruco_callback(self, msg):
         if len(msg.data) >= 3:
             self._last_aruco_t = self._time.time()
-            x, y, z = [round(v, 3) for v in msg.data[:3]]
-            self.label_aruco.setText(f"Pos:  X={x:+.3f}  Y={y:+.3f}  Z={z:+.3f}")
+            # Conversion m → cm pour l'affichage
+            x, y, z = [round(v * 100, 2) for v in msg.data[:3]]
+            self.label_aruco.setText(
+                f"Pos:  X={x:+.2f} cm   Y={y:+.2f} cm   Z={z:+.2f} cm"
+            )
 
     def aruco_orientation_callback(self, msg):
         if len(msg.data) >= 3:

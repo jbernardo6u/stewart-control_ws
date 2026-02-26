@@ -4,10 +4,17 @@
 
 Ce dépôt contient un workspace ROS2 (`colcon`) dédié au contrôle d'une plateforme Stewart.
 
+## Architecture
+
+📐 **[Documentation complète de l'architecture](src/stewart_control/docs/ARCHITECTURE.md)** — diagramme des nœuds/topics, description détaillée de chaque nœud, flux de données, firmware Arduino et configuration YAML.
+
 ## Structure
 
-- `src/stewart_control` : paquet principal contenant les noeuds ROS et le code de cinématique.
-- `src/stewart_control/Arduino` : code embarqué pour la carte contrôlant les vérins.
+- `src/stewart_control` : paquet principal contenant les nœuds ROS et le code de cinématique.
+- `src/stewart_control/arduino` : firmware Arduino Mega (PID + encodeurs).
+- `src/stewart_control/config` : configuration YAML centralisée.
+- `src/stewart_control/docs` : documentation d'architecture.
+- `src/stewart_control/test` : tests unitaires (33 tests).
 
 ## Compilation
 
@@ -29,9 +36,10 @@ ros2 run stewart_control stewart_node
 
 ## Tests
 
-Le projet inclut des tests unitaires pour les modules critiques :
-- Cinématique inverse (`test_inv_kinematics.py`)
-- Filtre de Kalman et fusion (`test_fusion.py`)
+Le projet inclut **33 tests unitaires** pour les modules critiques :
+- Cinématique inverse (`test_inv_kinematics.py` — 8 tests)
+- Filtre de Kalman et fusion (`test_fusion.py` — 15 tests)
+- Configuration YAML (`test_config.py` — 10 tests)
 
 ### Lancer les tests
 

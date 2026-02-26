@@ -54,12 +54,11 @@ jobs:
           python-version: "3.12"
 
       - name: Install dependencies
-        run: |
-          pip install numpy pytest
-          pip install -e src/stewart_control/
+        run: pip install numpy pytest
 
       - name: Run tests
         run: |
+          PYTHONPATH="src/stewart_control:$PYTHONPATH" \
           python -m pytest \
             src/stewart_control/test/test_inv_kinematics.py \
             src/stewart_control/test/test_fusion.py \
@@ -80,16 +79,16 @@ jobs:
       - name: Install dependencies
         run: |
           apt-get update
-          apt-get install -y python3-pip python3-numpy
-          pip install --break-system-packages numpy
+          apt-get install -y python3-pip python3-numpy python3-pyside2
 
       - name: Build workspace
         run: |
           source /opt/ros/jazzy/setup.bash
-          colcon build --symlink-install
+          colcon build --symlink-install --packages-select stewart_control
         shell: bash
 
       - name: Run colcon test
+        if: success()
         run: |
           source /opt/ros/jazzy/setup.bash
           source install/setup.bash
@@ -120,6 +119,9 @@ jobs:
 
       - name: Compile sketch
         run: |
+          mkdir -p /tmp/pilotage_feedback_mp
+          cp src/stewart_control/arduino/pilotage_feedback_mp.ino \
+             /tmp/pilotage_feedback_mp/
           arduino-cli compile \
-            --fqbn arduino:mega:atmega2560 \
-            src/stewart_control/arduino/pilotage_feedback_mp.ino
+            --fqbn arduino:avr:mega \
+            /tmp/pilotage_feedback_mp

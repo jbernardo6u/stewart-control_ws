@@ -1,4 +1,4 @@
-#!/home/rem/rtimulib-env/bin/python3
+#!/usr/bin/env python3
 
 from setuptools import setup
 import os
@@ -8,20 +8,20 @@ package_name = "stewart_control"
 
 setup(
     name=package_name,
-    version="0.0.0",
+    version="0.1.0",
     packages=[package_name],
     install_requires=[
         "setuptools",
-        "RTIMU",
-        "rclpy",
-        "PySide6",
-        "sensor_msgs",
+        "numpy",
     ],
     zip_safe=True,
-    maintainer="rem",
-    maintainer_email="rem@todo.todo",
-    description="TODO: Package description",
-    license="TODO: License declaration",
+    maintainer="Jbantu",
+    maintainer_email="jbantu@example.com",
+    description=(
+        "ROS2 control system for Stewart platform"
+        " with IMU fusion and ArUco vision feedback"
+    ),
+    license="Apache-2.0",
     entry_points={
         "console_scripts": [
             "imu_node=stewart_control.imu_node:main",

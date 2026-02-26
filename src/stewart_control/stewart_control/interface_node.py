@@ -336,7 +336,7 @@ class InterfaceGUI(QWidget):
         ctrl_inner.setSpacing(6)
 
         ctrl_header = QHBoxLayout()
-        ctrl_header.addWidget(QLabel("⚙"))
+        ctrl_header.addWidget(QLabel("\u2699"))
         ctrl_title = QLabel("CONTRÔLE MANUEL")
         ctrl_title.setStyleSheet(
             f"color: {TEXT_SECONDARY}; font-size: 10px; font-weight: bold;"
@@ -383,7 +383,7 @@ class InterfaceGUI(QWidget):
         ctrl_inner.addLayout(input_grid)
 
         self.button_update_manual = _make_button(
-            "Appliquer", ACCENT, ACCENT_HOVER, icon="▶"
+            "Appliquer", ACCENT, ACCENT_HOVER, icon="\u25b6"
         )
         self.button_update_manual.clicked.connect(self.send_manual_pose)
         ctrl_inner.addWidget(self.button_update_manual)
@@ -397,7 +397,7 @@ class InterfaceGUI(QWidget):
         act_inner.setSpacing(6)
 
         act_header = QHBoxLayout()
-        act_header.addWidget(QLabel("🎮"))
+        act_header.addWidget(QLabel("\u25cf"))
         act_title = QLabel("ACTIONS")
         act_title.setStyleSheet(
             f"color: {TEXT_SECONDARY}; font-size: 10px; font-weight: bold;"
@@ -417,18 +417,20 @@ class InterfaceGUI(QWidget):
         btn_grid.setSpacing(6)
 
         self.button_start_acq = _make_button(
-            "Acquisition", "#2d5aa0", "#3668b5", icon="📡"
+            "Acquisition", "#2d5aa0", "#3668b5", icon="\u25b8"
         )
         self.button_start_acq.clicked.connect(self.start_acquisition)
         self.button_start_att = _make_button(
-            "Automatique", "#2d8a4e", "#38a05e", icon="🤖"
+            "Automatique", "#2d8a4e", "#38a05e", icon="\u25b8"
         )
         self.button_start_att.clicked.connect(self.start_attelage)
-        self.button_manual = _make_button("Manuel", "#7c5cbf", "#9070d0", icon="🕹️")
+        self.button_manual = _make_button("Manuel", "#7c5cbf", "#9070d0", icon="\u25b8")
         self.button_manual.clicked.connect(self.start_manual_node)
-        self.button_uart = _make_button("État initial", "#5c7080", "#6d8494", icon="🏠")
+        self.button_uart = _make_button(
+            "État initial", "#5c7080", "#6d8494", icon="\u25b8"
+        )
         self.button_uart.clicked.connect(self.start_uart_node)
-        self.button_stop = _make_button("ARRÊTER", DANGER, DANGER_HOVER, icon="⏹")
+        self.button_stop = _make_button("ARRÊTER", DANGER, DANGER_HOVER, icon="\u25a0")
         self.button_stop.clicked.connect(self.stop_ros_launch)
 
         btn_grid.addWidget(self.button_start_acq, 0, 0)
@@ -447,7 +449,7 @@ class InterfaceGUI(QWidget):
         cam_inner.setSpacing(4)
 
         cam_header = QHBoxLayout()
-        cam_header.addWidget(QLabel("📹"))
+        cam_header.addWidget(QLabel("\u25cf"))
         cam_title = QLabel("CAMÉRA ARUCO")
         cam_title.setStyleSheet(
             f"color: {TEXT_SECONDARY}; font-size: 10px; font-weight: bold;"

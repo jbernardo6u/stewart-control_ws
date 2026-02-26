@@ -1,5 +1,7 @@
 # stewart_control ROS2 Project
 
+[![CI - Stewart Control](https://github.com/jbernardo6u/stewart-control_ws/actions/workflows/ci.yml/badge.svg)](https://github.com/jbernardo6u/stewart-control_ws/actions/workflows/ci.yml)
+
 Ce dépôt contient un workspace ROS2 (`colcon`) dédié au contrôle d'une plateforme Stewart.
 
 ## Structure

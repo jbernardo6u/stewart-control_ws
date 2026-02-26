@@ -35,18 +35,43 @@ ros2 run stewart_control stewart_node
 
 Ce projet utilise les outils suivants :
 
-* **Black** pour le formatage Python
+* **Black** pour le formatage Python (ligne max 88 caractères)
 * **flake8** pour le linting Python
-* **clang-format** pour la mise en forme du code Arduino/C++
 * **pre-commit** pour lancer automatiquement ces vérifications avant chaque commit
 
-Après avoir cloné le dépôt, installez les hooks :
+### Installation
+
+Après avoir cloné le dépôt :
 
 ```bash
-pip install --user pre-commit
+# Installer les dépendances
+pip install --user pre-commit black flake8
+
+# Installer les hooks git
 pre-commit install
-# lancer manuellement sur tous les fichiers pour la première fois
+
+# Lancer les vérifications sur tous les fichiers (première fois)
 pre-commit run --all-files
+```
+
+### Utilisation quotidienne
+
+Les hooks s'exécutent automatiquement avant chaque commit. Si des erreurs sont détectées :
+
+1. **Black/flake8** : corrections automatiques appliquées, vérifiez et re-commitez
+2. Le commit est bloqué si des corrections doivent être faites manuellement
+
+Pour lancer manuellement les vérifications :
+
+```bash
+# Sur tous les fichiers
+pre-commit run --all-files
+
+# Sur des fichiers spécifiques
+pre-commit run --files src/stewart_control/stewart_control/mon_fichier.py
+
+# Bypasser les hooks (déconseillé)
+git commit --no-verify -m "message"
 ```
 
 ## Contributions

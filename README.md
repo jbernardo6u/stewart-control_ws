@@ -31,6 +31,24 @@ ros2 run stewart_control stewart_node
 - `develop` : intégration des fonctionnalités en cours
 - branches de fonctionnalités pour chaque ticket
 
+## Qualité du code
+
+Ce projet utilise les outils suivants :
+
+* **Black** pour le formatage Python
+* **flake8** pour le linting Python
+* **clang-format** pour la mise en forme du code Arduino/C++
+* **pre-commit** pour lancer automatiquement ces vérifications avant chaque commit
+
+Après avoir cloné le dépôt, installez les hooks :
+
+```bash
+pip install --user pre-commit
+pre-commit install
+# lancer manuellement sur tous les fichiers pour la première fois
+pre-commit run --all-files
+```
+
 ## Contributions
 
 1. Créez une nouvelle branche `feature/...` ou `bugfix/...`.

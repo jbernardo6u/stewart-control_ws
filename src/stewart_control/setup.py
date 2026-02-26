@@ -41,5 +41,6 @@ setup(
         (os.path.join("share", package_name, "config"), glob("config/*.yaml")),
         ("share/" + package_name, ["share/stewart_control/calib_int.npz"]),
         ("share/" + package_name, ["share/stewart_control/calib_ext3.npz"]),
+        (os.path.join("share", package_name, "assets"), glob("assets/*.png")),
     ],
 )

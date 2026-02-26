@@ -205,7 +205,7 @@ class MotorPlotWidget(QWidget):
         self.ax.set_title(
             f"M{motor_number}", fontsize=10, fontweight="bold", color="#c0c0dd", pad=4
         )
-        self.ax.set_ylabel("L (m)", fontsize=7, labelpad=2)
+        self.ax.set_ylabel("L (cm)", fontsize=7, labelpad=2)
         self.ax.tick_params(labelsize=6, length=3, pad=2)
         self.ax.grid(True, linewidth=0.5)
 
@@ -247,9 +247,18 @@ class MotorPlotWidget(QWidget):
 
 
 class InterfaceGUI(QWidget):
+    # Chemin du logo — cherche source, install-share, workspace-root, etc.
+    _LOGO_FILENAME = "abmi_logo.png"
+    _LOGO_SEARCH_PATHS = [
+        # Source-tree: stewart_control/stewart_control/../assets/
+        os.path.join(os.path.dirname(__file__), "..", "assets", "abmi_logo.png"),
+        # Source-tree fallback: stewart_control/stewart_control/assets/
+        os.path.join(os.path.dirname(__file__), "assets", "abmi_logo.png"),
+    ]
+
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Stewart Platform — Contrôle & Monitoring")
+        self.setWindowTitle("Stewart Platform — ABMI Groupe")
         self.setMinimumSize(1100, 680)
         self.setStyleSheet(GLOBAL_STYLESHEET)
 
@@ -267,6 +276,58 @@ class InterfaceGUI(QWidget):
         # ══════════ COLONNE GAUCHE ══════════
         left_layout = QVBoxLayout()
         left_layout.setSpacing(8)
+
+        # ── Header Logo + Titre ──
+        header_frame = QFrame()
+        header_frame.setStyleSheet(
+            f"background-color: {BG_CARD}; border: 1px solid {BORDER};"
+            " border-radius: 10px;"
+        )
+        header_inner = QHBoxLayout(header_frame)
+        header_inner.setContentsMargins(10, 6, 10, 6)
+        header_inner.setSpacing(10)
+
+        self.logo_label = QLabel()
+        self.logo_label.setFixedSize(44, 44)
+        self.logo_label.setScaledContents(True)
+        self.logo_label.setStyleSheet("border: none; background: transparent;")
+        logo_path = self._find_logo()
+        if logo_path:
+            pix = QPixmap(logo_path)
+            if not pix.isNull():
+                self.logo_label.setPixmap(pix)
+            else:
+                self.logo_label.setText("ABMI")
+                self.logo_label.setStyleSheet(
+                    f"color: {ACCENT}; font-weight: bold; font-size: 11px;"
+                    " border: none; background: transparent;"
+                )
+        else:
+            self.logo_label.setText("ABMI")
+            self.logo_label.setStyleSheet(
+                f"color: {ACCENT}; font-weight: bold; font-size: 11px;"
+                " border: none; background: transparent;"
+            )
+        header_inner.addWidget(self.logo_label)
+
+        title_block = QVBoxLayout()
+        title_block.setSpacing(0)
+        app_title = QLabel("Stewart Platform")
+        app_title.setStyleSheet(
+            f"color: {TEXT_PRIMARY}; font-size: 15px; font-weight: bold;"
+            " border: none; background: transparent;"
+        )
+        app_subtitle = QLabel("ABMI Groupe — Contrôle & Monitoring")
+        app_subtitle.setStyleSheet(
+            f"color: {TEXT_SECONDARY}; font-size: 10px;"
+            " border: none; background: transparent;"
+        )
+        title_block.addWidget(app_title)
+        title_block.addWidget(app_subtitle)
+        header_inner.addLayout(title_block)
+        header_inner.addStretch()
+
+        left_layout.addWidget(header_frame)
 
         # ── Carte Contrôle ──
         ctrl_card = _card("Contrôle")
@@ -399,18 +460,17 @@ class InterfaceGUI(QWidget):
         cam_inner.addLayout(cam_header)
 
         self.video_label = QLabel()
-        self.video_label.setFixedSize(340, 240)
+        self.video_label.setMinimumSize(280, 210)
         self.video_label.setStyleSheet(
             f"border: 1px solid {BORDER}; border-radius: 6px;"
             f" background-color: #0a0a14;"
         )
         self.video_label.setScaledContents(True)
         self.video_label.setAlignment(Qt.AlignCenter)
-        cam_inner.addWidget(self.video_label)
+        cam_inner.addWidget(self.video_label, stretch=1)
 
-        left_layout.addWidget(cam_card)
-        left_layout.addStretch()
-        main_layout.addLayout(left_layout, 35)
+        left_layout.addWidget(cam_card, stretch=1)
+        main_layout.addLayout(left_layout, 30)
 
         # ══════════ COLONNE DROITE ══════════
         right_layout = QVBoxLayout()
@@ -485,11 +545,11 @@ class InterfaceGUI(QWidget):
         motor_h.addStretch()
         motor_inner.addLayout(motor_h)
 
-        self.label_verins = QLabel("Consignes:  —")
+        self.label_verins = QLabel("Consignes:  — cm")
         self.label_verins.setStyleSheet(
             f"color: {ACCENT}; font-size: 12px; font-family: 'Consolas', monospace;"
         )
-        self.label_feedback = QLabel("Feedback:  —")
+        self.label_feedback = QLabel("Feedback:  — cm")
         self.label_feedback.setStyleSheet(
             f"color: {WARNING}; font-size: 12px; font-family: 'Consolas', monospace;"
         )
@@ -500,16 +560,11 @@ class InterfaceGUI(QWidget):
         # ── Carte Graphes (3×2) ──
         plots_card = _card("Graphes")
         plots_inner = QVBoxLayout(plots_card)
-        plots_inner.setContentsMargins(8, 6, 8, 6)
-        plots_inner.setSpacing(4)
-        plots_h = QHBoxLayout()
-        plots_h.addWidget(QLabel("📈"))
-        plots_h.addWidget(_section_label("GRAPHES MOTEURS"))
-        plots_h.addStretch()
-        plots_inner.addLayout(plots_h)
+        plots_inner.setContentsMargins(4, 4, 4, 4)
+        plots_inner.setSpacing(2)
 
         plots_grid = QGridLayout()
-        plots_grid.setSpacing(4)
+        plots_grid.setSpacing(2)
         self.motor_plots = []
         for i in range(6):
             plot = MotorPlotWidget(i + 1)
@@ -519,8 +574,7 @@ class InterfaceGUI(QWidget):
         plots_inner.addLayout(plots_grid)
         right_layout.addWidget(plots_card, stretch=1)
 
-        right_layout.addStretch()
-        main_layout.addLayout(right_layout, 65)
+        main_layout.addLayout(right_layout, 70)
 
         self.setLayout(main_layout)
 
@@ -547,6 +601,36 @@ class InterfaceGUI(QWidget):
         self._led_timer.start(2000)
 
     # ── helpers ──
+    @classmethod
+    def _find_logo(cls):
+        """Search for the ABMI logo in several locations (source tree, colcon share)."""
+        # 1. Static search paths (source tree)
+        for p in cls._LOGO_SEARCH_PATHS:
+            abspath = os.path.abspath(p)
+            if os.path.isfile(abspath):
+                return abspath
+
+        # 2. Colcon share directory (installed package)
+        try:
+            from ament_index_python.packages import get_package_share_directory
+
+            share_dir = get_package_share_directory("stewart_control")
+            share_logo = os.path.join(share_dir, "assets", cls._LOGO_FILENAME)
+            if os.path.isfile(share_logo):
+                return share_logo
+        except Exception:
+            pass
+
+        # 3. Workspace-root relative fallback (cwd-based)
+        for rel in [
+            os.path.join("src", "stewart_control", "assets", cls._LOGO_FILENAME),
+            os.path.join("assets", cls._LOGO_FILENAME),
+        ]:
+            if os.path.isfile(rel):
+                return os.path.abspath(rel)
+
+        return None
+
     @staticmethod
     def _spin(lo, hi, decimals, step):
         s = QDoubleSpinBox()
@@ -682,7 +766,7 @@ class InterfaceGUI(QWidget):
             self._last_motor_t = self._time.time()
             vals = [round(v, 3) for v in msg.data[:6]]
             self.label_verins.setText(
-                "C: " + "  ".join([f"V{i + 1}:{v:.3f}" for i, v in enumerate(vals)])
+                "C: " + "  ".join([f"V{i + 1}:{v:.3f} cm" for i, v in enumerate(vals)])
             )
             self.last_consigne = vals
 
@@ -691,7 +775,7 @@ class InterfaceGUI(QWidget):
             self._last_motor_t = self._time.time()
             vals = [round(v, 3) for v in msg.data[:6]]
             self.label_feedback.setText(
-                "F: " + "  ".join([f"V{i + 1}:{v:.3f}" for i, v in enumerate(vals)])
+                "F: " + "  ".join([f"V{i + 1}:{v:.3f} cm" for i, v in enumerate(vals)])
             )
             for i in range(6):
                 self.motor_plots[i].update_plot(self.last_consigne[i], vals[i])

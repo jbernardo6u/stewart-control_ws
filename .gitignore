@@ -1,13 +1,14 @@
-# ROS2 build artifacts
-build/
-install/
-log/
+# ROS2 build artifacts (anywhere in the workspace)
+**/build/
+**/install/
+**/log/
 
 # Python artifacts
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
+*.egg-info/
 
 # CMake
 CMakeFiles/

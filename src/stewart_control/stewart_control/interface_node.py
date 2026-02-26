@@ -92,8 +92,7 @@ class InterfaceGUI(QWidget):
         self.setWindowTitle("Stewart Platform")
         self.setMinimumSize(800, 480)
 
-        self.setStyleSheet(
-            """
+        self.setStyleSheet("""
             QWidget { background-color: #f4f6f9; font-family: Arial;
                      font-size: 11px; }
             QGroupBox { font-weight: bold; font-size: 12px; border: 1px
@@ -107,8 +106,7 @@ class InterfaceGUI(QWidget):
                                        color: white; }
             QPushButton#stop_button { background-color: #f44336;
                                       color: white; }
-        """
-        )
+        """)
 
         # Publishers ROS2
         self.pos_pub = None

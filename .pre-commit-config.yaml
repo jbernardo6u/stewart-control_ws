@@ -1,26 +1,29 @@
 repos:
-  - repo: https://github.com/psf/black
-    rev: 24.1.0
+  - repo: local
     hooks:
       - id: black
-        language_version: python3
+        name: black
+        entry: black
+        language: system
+        types: [python]
+        exclude: ^(build|install|log)/
 
-  - repo: https://gitlab.com/pycqa/flake8
-    rev: 6.1.0
-    hooks:
       - id: flake8
-
-  - repo: https://github.com/pre-commit/mirrors-clang-format
-    rev: v16.0.6
-    hooks:
-      - id: clang-format
-        files: \.(c|cpp|h|hpp|ino)$
-        args: ['-style=file']
+        name: flake8
+        entry: flake8
+        language: system
+        types: [python]
+        args: ['--max-line-length=88', '--extend-ignore=E203,W503']
+        exclude: ^(build|install|log)/
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.6.0
     hooks:
       - id: end-of-file-fixer
+        exclude: ^(build|install|log)/
       - id: trailing-whitespace
+        exclude: ^(build|install|log)/
       - id: check-yaml
+        exclude: ^(build|install|log)/
       - id: check-added-large-files
+        exclude: ^(build|install|log)/

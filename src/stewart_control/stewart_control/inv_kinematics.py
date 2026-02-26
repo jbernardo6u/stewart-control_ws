@@ -82,11 +82,7 @@ class StewartPlatform:
 
     def solve(self, trans, rotation):
         self.B, self.P = self.frame()
-        R = (
-            self.rotX(rotation[0])
-            @ self.rotY(rotation[1])
-            @ self.rotZ(rotation[2])
-        )
+        R = self.rotX(rotation[0]) @ self.rotY(rotation[1]) @ self.rotZ(rotation[2])
         diff_vector = trans[:, None] + self.home_pos[:, None] + R @ self.P - self.B
         lengths = np.linalg.norm(diff_vector, axis=0)
         return lengths  # retourne le vecteur de 6 longueurs

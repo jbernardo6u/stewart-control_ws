@@ -1,0 +1,60 @@
+# ============================================================
+# Stewart Platform — Configuration Parameters
+# ============================================================
+# Ce fichier centralise toutes les constantes du système.
+# Modifiez les valeurs ici au lieu de toucher au code Python.
+# ============================================================
+
+# --- Géométrie de la plateforme Stewart ---
+stewart_platform:
+  radius_base: 0.075           # rayon de la base (m)
+  radius_platform: 0.04        # rayon de la plateforme mobile (m)
+  gamma_base: 11.3             # demi-angle base (degrés)
+  gamma_platform: 17.3         # demi-angle plateforme (degrés)
+  home_position: [0.0, 0.0, 0.185]  # position home (m)
+  L0: [18.86, 18.86, 18.86, 18.86, 18.86, 18.86]  # longueurs au repos (cm)
+
+# --- Communication série (Arduino) ---
+serial:
+  port: "/dev/ttyACM0"
+  baudrate: 115200
+  timeout: 1                   # timeout lecture (s)
+  startup_delay: 2.0           # délai après ouverture (s)
+
+# --- Contrôle des actionneurs ---
+actuators:
+  length_threshold: 1.0        # seuil de changement pour envoi (cm)
+  max_displacement: 10.0       # déplacement max autorisé (cm)
+  feedback_timer_period: 0.05  # période de lecture feedback (s)
+  home_vector: [0.10, 0.10, 0.10, 0.10, 0.10, 0.10]  # vecteur position home
+
+# --- Caméra et ArUco ---
+aruco:
+  dictionary: "DICT_4X4_50"
+  marker_size: 0.022           # taille du marqueur (m)
+  fixed_marker_id: 34          # ID du marqueur fixe (repère)
+  mobile_marker_id: 28         # ID du marqueur mobile (plateforme)
+  loop_rate: 0.1               # période de la boucle (s) → 10 Hz
+
+# --- IMU (2× MPU-9250) ---
+imu:
+  i2c_bus: 1
+  imu1_address: 0x69
+  imu2_address: 0x68
+  calib1_path: "/home/rem/ros2_ws/src/stewart_control/stewart_control/calib1.json"
+  calib2_path: "/home/rem/ros2_ws/src/stewart_control/stewart_control/calib2.json"
+  publish_rate: 0.1            # période de publication (s) → 10 Hz
+  auto_calib_seconds: 3.0      # durée de la calibration auto yaw (s)
+
+# --- Fusion de capteurs (Kalman) ---
+fusion:
+  kalman_roll:
+    q: 0.02                    # bruit de processus
+    r: 1.0                     # bruit de mesure
+  kalman_pitch:
+    q: 0.02
+    r: 1.0
+  kalman_yaw:
+    q: 0.05
+    r: 2.0
+  alpha_yaw_mean: 0.05         # facteur EMA pour correction yaw dynamique

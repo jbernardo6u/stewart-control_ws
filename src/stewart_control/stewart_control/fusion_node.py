@@ -4,6 +4,7 @@ import rclpy
 from rclpy.node import Node
 from std_msgs.msg import Float32MultiArray
 from stewart_control.fusion_utils import wrap_deg, Kalman1D
+from stewart_control.config_loader import get_config
 
 # ============================================================
 # FUSION NODE
@@ -27,16 +28,19 @@ class FusionNode(Node):
         # Publisher
         self.pub_fusion = self.create_publisher(Float32MultiArray, "F_orientation", 10)
 
+        cfg = get_config()
+        fus = cfg["fusion"]
+
         # Kalman filters
-        self.kf_roll = Kalman1D(q=0.02, r=1.0)
-        self.kf_pitch = Kalman1D(q=0.02, r=1.0)
-        self.kf_yaw = Kalman1D(q=0.05, r=2.0)
+        self.kf_roll = Kalman1D(q=fus["kalman_roll"]["q"], r=fus["kalman_roll"]["r"])
+        self.kf_pitch = Kalman1D(q=fus["kalman_pitch"]["q"], r=fus["kalman_pitch"]["r"])
+        self.kf_yaw = Kalman1D(q=fus["kalman_yaw"]["q"], r=fus["kalman_yaw"]["r"])
 
         self.last_imu = None
         self.last_cam = None
 
         self.yaw_moy = 0.0
-        self.ALPHA_YM = 0.05
+        self.ALPHA_YM = fus["alpha_yaw_mean"]
 
         self.get_logger().info("Fusion node démarré ✅")
 

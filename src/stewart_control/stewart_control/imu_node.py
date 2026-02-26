@@ -7,6 +7,7 @@ import time
 import math
 import smbus
 from imusensor.MPU9250 import MPU9250
+from stewart_control.config_loader import get_config
 
 
 # ==============================
@@ -107,32 +108,31 @@ class IMUPublisher(Node):
     def __init__(self):
         super().__init__("imu_error_node")
 
+        cfg = get_config()
+        imu_cfg = cfg["imu"]
+
         self.pub_imu = self.create_publisher(Float32MultiArray, "imu_error", 10)
 
-        bus = smbus.SMBus(1)
-        self.imu1 = MPU9250.MPU9250(bus, 0x69)
-        self.imu2 = MPU9250.MPU9250(bus, 0x68)
+        bus = smbus.SMBus(imu_cfg["i2c_bus"])
+        self.imu1 = MPU9250.MPU9250(bus, imu_cfg["imu1_address"])
+        self.imu2 = MPU9250.MPU9250(bus, imu_cfg["imu2_address"])
         self.imu1.begin()
         self.imu2.begin()
 
-        self.imu1.loadCalibDataFromFile(
-            "/home/rem/ros2_ws/src/stewart_control/stewart_control/calib1.json"
-        )
-        self.imu2.loadCalibDataFromFile(
-            "/home/rem/ros2_ws/src/stewart_control/stewart_control/calib2.json"
-        )
+        self.imu1.loadCalibDataFromFile(imu_cfg["calib1_path"])
+        self.imu2.loadCalibDataFromFile(imu_cfg["calib2_path"])
 
         self.get_logger().info("IMU1 & IMU2 initialisées et calibrées ✅")
 
-        # ✅ yaw offset AUTO (comme ton idée “yaw moy”)
-        self.AUTO_CALIB_SECONDS = 3.0  # tu peux mettre 2.0 / 5.0
+        # yaw offset AUTO
+        self.AUTO_CALIB_SECONDS = imu_cfg["auto_calib_seconds"]
         self._t0 = time.time()
         self._yaw_sum = 0.0
         self._yaw_n = 0
         self.yaw_offset_deg = 0.0
         self.yaw_offset_ready = False
 
-        self.timer = self.create_timer(0.1, self.publish_imu_error)
+        self.timer = self.create_timer(imu_cfg["publish_rate"], self.publish_imu_error)
 
     def publish_imu_error(self):
         self.imu1.readSensor()

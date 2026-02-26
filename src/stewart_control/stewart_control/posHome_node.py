@@ -4,11 +4,16 @@ from rclpy.node import Node
 from std_msgs.msg import Float32MultiArray
 import serial
 import time
+from stewart_control.config_loader import get_config
 
 
 class PosHomeNode(Node):
     def __init__(self):
         super().__init__("pos_home_node")
+
+        cfg = get_config()
+        ser_cfg = cfg["serial"]
+        act = cfg["actuators"]
 
         # Publisher pour le feedback
         self.publisher_feedback = self.create_publisher(
@@ -16,17 +21,19 @@ class PosHomeNode(Node):
         )
 
         # Configuration UART
-        self.ser = serial.Serial("/dev/ttyACM0", 115200, timeout=1)
-        time.sleep(2)
+        self.ser = serial.Serial(
+            ser_cfg["port"], ser_cfg["baudrate"], timeout=ser_cfg["timeout"]
+        )
+        time.sleep(ser_cfg["startup_delay"])
         self.ser.reset_input_buffer()
         self.ser.reset_output_buffer()
         self.get_logger().info("Port UART ouvert et prêt.")
 
         # Vecteur à envoyer
-        self.vecteur = [0.10, 0.10, 0.10, 0.10, 0.10, 0.10]
+        self.vecteur = act["home_vector"]
 
         # Timer pour envoi régulier
-        self.create_timer(0.05, self.send_vecteur)
+        self.create_timer(act["feedback_timer_period"], self.send_vecteur)
 
     def send_vecteur(self):
         message = ",".join([f"{v:.2f}" for v in self.vecteur]) + "\n"

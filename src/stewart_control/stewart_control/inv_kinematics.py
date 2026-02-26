@@ -6,13 +6,20 @@ import numpy as np
 
 class StewartPlatform:
     def __init__(
-        self, radious_base, radious_platform, gamma_base, gamma_platform
+        self,
+        radious_base,
+        radious_platform,
+        gamma_base,
+        gamma_platform,
+        home_position=None,
     ) -> None:
         self.rb = radious_base  # rayon de la base
         self.rp = radious_platform  # rayon de la plateforme
         self.gamma_B = np.deg2rad(gamma_base)  # demi-angle base
         self.gamma_P = np.deg2rad(gamma_platform)  # demi-angle plateforme
-        self.home_pos = np.array([0, 0, 0.185])  # position home de la plateforme
+        if home_position is None:
+            home_position = [0, 0, 0.185]
+        self.home_pos = np.array(home_position)  # position home de la plateforme
         self.B = None
         self.P = None
         self.L = None

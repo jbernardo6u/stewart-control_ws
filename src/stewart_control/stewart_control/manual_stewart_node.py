@@ -7,11 +7,17 @@ import rclpy
 from rclpy.node import Node
 from std_msgs.msg import Float32MultiArray
 from stewart_control.inv_kinematics import StewartPlatform
+from stewart_control.config_loader import get_config
 
 
 class StewartNode(Node):
     def __init__(self):
         super().__init__("stewart_node")
+
+        cfg = get_config()
+        sp = cfg["stewart_platform"]
+        ser_cfg = cfg["serial"]
+        act = cfg["actuators"]
 
         # Publisher pour les longueurs calculées à envoyer à l'Arduino
         self.publisher_ = self.create_publisher(
@@ -32,26 +38,35 @@ class StewartNode(Node):
         )
 
         # Configuration UART vers Arduino
-        self.ser = serial.Serial("/dev/ttyACM0", 115200, timeout=1)
-        time.sleep(2)
+        self.ser = serial.Serial(
+            ser_cfg["port"], ser_cfg["baudrate"], timeout=ser_cfg["timeout"]
+        )
+        time.sleep(ser_cfg["startup_delay"])
 
         # Vider le buffer série
         self.ser.reset_input_buffer()
         self.ser.reset_output_buffer()
 
         # Configuration de la plateforme Stewart
-        self.platform = StewartPlatform(0.075, 0.04, 11.3, 17.3)
-        self.L0 = np.array([18.86] * 6)
+        self.platform = StewartPlatform(
+            sp["radius_base"],
+            sp["radius_platform"],
+            sp["gamma_base"],
+            sp["gamma_platform"],
+            home_position=sp["home_position"],
+        )
+        self.L0 = np.array(sp["L0"])
 
         # Variables d’état
         self.position = np.zeros(3)
         self.orientation = np.zeros(3)
         self.continuous = False
         self.last_deplacement = [0.0] * 6
-        self.length_threshold = 1.0
+        self.length_threshold = act["length_threshold"]
+        self.max_displacement = act["max_displacement"]
 
         # Timer pour lecture série
-        self.create_timer(0.05, self.read_feedback)
+        self.create_timer(act["feedback_timer_period"], self.read_feedback)
 
     def pos_callback(self, msg):
         if len(msg.data) >= 3:
@@ -83,7 +98,7 @@ class StewartNode(Node):
 
             # Vérification avant envoi UART : aucune valeur ne doit dépasser 10cm
 
-            if all(abs(d) <= 10 for d in deplacement):
+            if all(abs(d) <= self.max_displacement for d in deplacement):
 
                 consigne = ",".join([f"{d:.2f}" for d in deplacement])
                 self.ser.write((consigne + "\n").encode())

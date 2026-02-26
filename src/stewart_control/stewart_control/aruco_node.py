@@ -12,6 +12,7 @@ import numpy as np
 import math
 import os
 from ament_index_python.packages import get_package_share_directory
+from stewart_control.config_loader import get_config
 
 
 class ArucoRelativePose(Node):
@@ -33,8 +34,12 @@ class ArucoRelativePose(Node):
             self.get_logger().error("Erreur : impossible d'ouvrir la caméra.")
             return
 
+        cfg = get_config()
+        aruco_cfg = cfg["aruco"]
+
         # ------ ArUco ------
-        self.aruco_dict = aruco.getPredefinedDictionary(aruco.DICT_4X4_50)
+        aruco_dict_id = getattr(aruco, aruco_cfg["dictionary"])
+        self.aruco_dict = aruco.getPredefinedDictionary(aruco_dict_id)
         self.parameters = aruco.DetectorParameters_create()
 
         # ------ Charger calibration intrinsèque + extrinsèque ------
@@ -46,7 +51,7 @@ class ArucoRelativePose(Node):
         intr = np.load(intr_path)
         self.mtx = intr["mtx"]
         self.dist = intr["dist"]
-        self.marker_size = 0.022  # m
+        self.marker_size = aruco_cfg["marker_size"]
 
         extr = np.load(extr_path)
         self.rvec_ext = extr["rvec"].reshape(3, 1)
@@ -54,11 +59,11 @@ class ArucoRelativePose(Node):
         self.R_ext, _ = cv2.Rodrigues(self.rvec_ext)
 
         # IDs
-        self.fixed_id = 34  # ID du repère fixe
-        self.mobile_id = 28  # ID mobile
+        self.fixed_id = aruco_cfg["fixed_marker_id"]
+        self.mobile_id = aruco_cfg["mobile_marker_id"]
 
-        # Timer ROS2 (10 Hz)
-        self.timer = self.create_timer(0.1, self.loop)
+        # Timer ROS2
+        self.timer = self.create_timer(aruco_cfg["loop_rate"], self.loop)
 
     def rvec_to_euler(self, rvec):
         R, _ = cv2.Rodrigues(rvec)

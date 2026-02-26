@@ -25,6 +25,32 @@ ros2 launch stewart_control stewart_ordered_launch.py
 ros2 run stewart_control stewart_node
 ```
 
+## Tests
+
+Le projet inclut des tests unitaires pour les modules critiques :
+- Cinématique inverse (`test_inv_kinematics.py`)
+- Filtre de Kalman et fusion (`test_fusion.py`)
+
+### Lancer les tests
+
+```bash
+# Installer pytest si nécessaire
+pip install --user pytest
+
+# Lancer tous les tests fonctionnels
+python -m pytest src/stewart_control/test/test_inv_kinematics.py \
+                 src/stewart_control/test/test_fusion.py -v
+
+# Lancer un fichier de test spécifique
+python -m pytest src/stewart_control/test/test_inv_kinematics.py -v
+
+# Avec rapport de couverture (optionnel)
+pip install --user pytest-cov
+python -m pytest src/stewart_control/test/ --cov=stewart_control
+```
+
+**Note** : Les tests ament (copyright, flake8, pep257) nécessitent un environnement ROS2 complet.
+
 ## Branches Git
 
 - `main` : version stable

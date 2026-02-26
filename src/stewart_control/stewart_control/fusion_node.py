@@ -3,42 +3,7 @@
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import Float32MultiArray
-
-# ============================================================
-# Outils angles
-# ============================================================
-
-
-def wrap_deg(a):
-    return (float(a) + 180.0) % 360.0 - 180.0
-
-
-# ============================================================
-# Kalman 1D
-# ============================================================
-
-
-class Kalman1D:
-    def __init__(self, q=0.02, r=1.0):
-        self.x = 0.0
-        self.P = 1.0
-        self.Q = float(q)
-        self.R = float(r)
-
-    def predict(self, x_pred):
-        self.x = wrap_deg(float(x_pred))
-        self.P = self.P + self.Q
-
-    def update(self, z):
-        z = wrap_deg(float(z))
-        y = wrap_deg(z - self.x)
-        S = self.P + self.R
-        if S <= 1e-12:
-            return
-        K = self.P / S
-        self.x = wrap_deg(self.x + K * y)
-        self.P = (1.0 - K) * self.P
-
+from stewart_control.fusion_utils import wrap_deg, Kalman1D
 
 # ============================================================
 # FUSION NODE
